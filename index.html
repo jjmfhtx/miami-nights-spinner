@@ -407,7 +407,12 @@
 
   const spinBtn = document.getElementById('spinBtn');
   const resultEl = document.getElementById('result');
-  const ACTUAL_WIN_CHANCE = 1 / 50;
+  let ACTUAL_WIN_CHANCE = 1 / 50;
+
+  fetch('config.json?' + Date.now())
+    .then(r => r.json())
+    .then(cfg => { if (cfg.odds > 0) ACTUAL_WIN_CHANCE = 1 / cfg.odds; })
+    .catch(() => {});
 
   spinBtn.addEventListener('click', () => {
     if (spinning) return;

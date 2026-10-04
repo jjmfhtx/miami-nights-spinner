@@ -409,18 +409,24 @@
   const resultEl = document.getElementById('result');
   let ACTUAL_WIN_CHANCE = 1 / 50;
 
-  fetch('config.json?' + Date.now())
-    .then(r => r.json())
-    .then(cfg => { if (cfg.odds > 0) ACTUAL_WIN_CHANCE = 1 / cfg.odds; })
-    .catch(() => {});
+  async function refreshOdds() {
+    try {
+      const r = await fetch('config.json?' + Date.now());
+      const cfg = await r.json();
+      if (cfg.odds > 0) ACTUAL_WIN_CHANCE = 1 / cfg.odds;
+    } catch {}
+  }
 
-  spinBtn.addEventListener('click', () => {
+  refreshOdds();
+
+  spinBtn.addEventListener('click', async () => {
     if (spinning) return;
     spinning = true;
     spinBtn.disabled = true;
     resultEl.textContent = '...';
     resultEl.classList.remove('winner');
 
+    await refreshOdds();
     const isWinner = Math.random() < ACTUAL_WIN_CHANCE;
 
     const fullSpins = 2 + Math.floor(Math.random() * 2);
